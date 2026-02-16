@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
     Box,
     Typography,
-    Paper,
     Grid,
     Card,
     CardContent,
@@ -34,12 +33,12 @@ import {
     CalendarToday as CalendarIcon,
     AccountBalance as AccountBalanceIcon,
     CheckCircle as CheckCircleIcon,
-    Warning as WarningIcon,
+
     TrendingUp as TrendingUpIcon,
     Lock as LockIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { SERVER_BASE_URL, getProfilePhotoUrl } from '../utils/urlHelper';
+import { getProfilePhotoUrl } from '../utils/urlHelper';
 import api from '../api/axiosConfig';
 import { useNavigate } from 'react-router-dom';
 

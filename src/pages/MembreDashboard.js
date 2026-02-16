@@ -267,7 +267,7 @@ const MembreDashboard = () => {
             console.log('Chargement terminé, setLoading(false)');
             setLoading(false);
         }
-    }, [navigate]); // Ajouter navigate aux dépendances de useCallback
+    }, []); // Supprimer navigate des dépendances de useCallback
 
     useEffect(() => {
         fetchMembreData();

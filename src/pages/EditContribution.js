@@ -12,7 +12,7 @@ import { Save, ArrowBack } from '@mui/icons-material';
 const EditContribution = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { } = useAuth();
+
 
     const [contribution, setContribution] = useState(null);
     const [members, setMembers] = useState([]);
@@ -139,7 +139,7 @@ const EditContribution = () => {
                 donateur_telephone: formData.donateur_type === 'externe' ? formData.donateur_telephone : null,
             };
 
-            const response = await api.put(`/contributions/${id}`, payload);
+            await api.put(`/contributions/${id}`, payload);
 
             showSuccessNotification('Contribution modifiée avec succès!');
             navigate('/contributions');
