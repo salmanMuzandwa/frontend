@@ -1,0 +1,24 @@
+# Dépendances
+node_modules/
+
+# Production
+build/
+
+# Environnement et Sécurité (TRÈS IMPORTANT)
+# Environnement et Sécurité (TRÈS IMPORTANT)
+.env
+.env*
+!.env.example
+
+# Base de données locale
+*.db
+*.sqlite
+data/
+
+# Fichiers uploadés par les utilisateurs
+uploads/
+
+# Logs et système
+*.log
+.DS_Store
+Thumbs.db
