@@ -6,11 +6,16 @@ const API_URL = process.env.REACT_APP_API_URL ||
 
 const api = axios.create({
     baseURL: API_URL,
-    timeout: 10000,
+    timeout: 30000, // Augmenté pour Render (cold starts)
     headers: {
         'Content-Type': 'application/json'
     }
 });
+
+console.log('Axios Initialized with baseURL:', API_URL);
+if (!process.env.REACT_APP_API_URL && process.env.NODE_ENV === 'production') {
+    console.warn('ATTENTION: REACT_APP_API_URL n\'est pas défini. L\'API risque de ne pas être jointe.');
+}
 
 // INTERCEPTEUR DE REQUÊTE : Injecter le token automatiquement
 api.interceptors.request.use(

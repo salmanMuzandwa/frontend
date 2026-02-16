@@ -31,7 +31,9 @@ import ChangePassword from './pages/ChangePassword';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
-console.log("VERSION DU CODE: 2.0 - API UTILISEE: /api");
+// Debug API context
+import api from './api/axiosConfig';
+console.log("VERSION DU CODE: 2.1 - BASE URL API:", api.defaults.baseURL);
 
 function App() {
     return (
