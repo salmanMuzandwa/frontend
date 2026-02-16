@@ -1,8 +1,13 @@
 import axios from 'axios';
 
 // Utiliser REACT_APP_API_URL si disponible, sinon fallback sur la logique existante
-const API_URL = process.env.REACT_APP_API_URL ||
+let API_URL = process.env.REACT_APP_API_URL ||
     (process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000/api');
+
+// Robustesse : s'assurer que l'URL se termine par /api si c'est une URL absolue
+if (API_URL && API_URL.startsWith('http') && !API_URL.includes('/api')) {
+    API_URL = API_URL.endsWith('/') ? `${API_URL}api` : `${API_URL}/api`;
+}
 
 const api = axios.create({
     baseURL: API_URL,
