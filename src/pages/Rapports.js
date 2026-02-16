@@ -241,6 +241,33 @@ export default function Rapports() {
         }
     }, [hasPermission, rapportType, periode, dateDebut, dateFin]);
 
+    const exportRapport = async (format) => {
+        try {
+            const params = {
+                type: rapportType,
+                periode: periode,
+                dateDebut,
+                dateFin,
+                format
+            };
+
+            const response = await api.get('/rapports/export', {
+                params,
+                responseType: 'blob'
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `rapport_${rapportType}_${format}.${format === 'excel' ? 'xlsx' : 'pdf'}`);
+            document.body.appendChild(link);
+            link.click();
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Erreur lors de l\'export:', error);
+            setError('Erreur lors de l\'export du rapport');
+        }
+    };
 
     useEffect(() => {
         if (hasPermission('rapports')) {
