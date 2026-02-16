@@ -1,6 +1,6 @@
 // src/pages/AdminDashboard.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Container, Typography, Grid, Paper, Box, CircularProgress,
     Alert, List, ListItem, ListItemText, Avatar, Card, CardContent,
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
     const theme = useTheme();
 
     // Synchronisation automatique depuis le frontend
-    const syncData = async () => {
+    const syncData = useCallback(async () => {
         try {
             setSyncing(true);
             const response = await fetch(getApiUrl('/admin/sync'), {
@@ -143,7 +143,7 @@ const AdminDashboard = () => {
         } finally {
             setSyncing(false);
         }
-    };
+    }, [token]);
 
     // Synchronisation automatique toutes les 5 minutes
     useEffect(() => {
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
         }, 5 * 60 * 1000); // 5 minutes
 
         return () => clearInterval(syncInterval);
-    }, [token]);
+    }, [token, syncData]);
 
     useEffect(() => {
         const fetchDashboardData = async () => {

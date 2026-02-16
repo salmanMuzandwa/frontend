@@ -96,12 +96,7 @@ const TresorierDashboard = () => {
     // Préparer les données pour les graphiques
     const transactionsData = stats?.contributionsEvolution || [];
 
-    // Données pour le graphique des types de transactions
-    const transactionsTypes = [
-        { name: 'Financières', value: stats?.totalContributions || 0, color: '#4caf50' },
-        { name: 'Services', value: 0, color: '#2196f3' },
-        { name: 'Compétences', value: 0, color: '#ff9800' }
-    ];
+
 
     if (loading) {
         return (

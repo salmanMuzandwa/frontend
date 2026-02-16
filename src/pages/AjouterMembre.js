@@ -29,7 +29,7 @@ const AjouterMembre = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
-    const { token, logout } = useAuth();
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {

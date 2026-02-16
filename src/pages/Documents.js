@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
     Box,
     Container,
@@ -38,13 +38,10 @@ const Documents = () => {
     const [documentType, setDocumentType] = useState('');
     const [documentTitle, setDocumentTitle] = useState('');
     const [uploading, setUploading] = useState(false);
-    const [deleteOpen, setDeleteOpen] = useState(false);
     const [deletingDocument, setDeletingDocument] = useState(null);
-    const [viewOpen, setViewOpen] = useState(false);
-    const [viewingDocument, setViewingDocument] = useState(null);
     const { token } = useAuth();
 
-    const fetchDocuments = async () => {
+    const fetchDocuments = useCallback(async () => {
         setLoading(true);
         try {
             const response = await api.get('/documents');
@@ -58,12 +55,11 @@ const Documents = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         fetchDocuments();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [fetchDocuments]);
 
     if (loading) {
         return (
@@ -119,7 +115,6 @@ const Documents = () => {
 
     const handleDeleteClick = (document) => {
         setDeletingDocument(document);
-        setDeleteOpen(true);
     };
 
     const handleDelete = async () => {
@@ -143,7 +138,6 @@ const Documents = () => {
                 )
             );
 
-            setDeleteOpen(false);
             setDeletingDocument(null);
 
             // Afficher un message de succès
@@ -180,29 +174,7 @@ const Documents = () => {
         }
     };
 
-    const handleDownload = async (document) => {
-        try {
-            const response = await api.get(`/documents/${document.id_document || document.id}/download`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                responseType: 'blob'
-            });
 
-            // Créer un lien de téléchargement
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', document.titre || document.nom || 'document');
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            window.URL.revokeObjectURL(url);
-        } catch (err) {
-            console.error('Erreur lors du téléchargement du document :', err);
-            setError('Erreur lors du téléchargement du document');
-        }
-    };
 
     return (
         <>
@@ -345,11 +317,11 @@ const Documents = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            <Dialog open={deleteOpen} onClose={() => !uploading && setDeleteOpen(false)}>
+            <Dialog open={Boolean(deletingDocument)} onClose={() => !uploading && setDeletingDocument(null)}>
                 <DialogTitle>Confirmer la suppression</DialogTitle>
                 <DialogContent>Êtes-vous sûr de vouloir supprimer "{deletingDocument?.titre}" ?</DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setDeleteOpen(false)}>Annuler</Button>
+                    <Button onClick={() => setDeletingDocument(null)}>Annuler</Button>
                     <Button onClick={handleDelete} color="error">Supprimer</Button>
                 </DialogActions>
             </Dialog>

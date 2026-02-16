@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Typography,
@@ -23,8 +23,6 @@ import {
     FormControl,
     InputLabel,
     Select,
-    Card,
-    CardContent,
     Tabs,
     Tab,
 } from '@mui/material';
@@ -32,11 +30,7 @@ import {
     Add as AddIcon,
     Edit as EditIcon,
     Delete as DeleteIcon,
-    Support as SupportIcon,
     AttachMoney as AttachMoneyIcon,
-    LocalHospital as LocalHospitalIcon,
-    Warning as WarningIcon,
-    CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
@@ -78,7 +72,6 @@ export default function CasSociaux() {
     const [assistances, setAssistances] = useState([]);
     const [membres, setMembres] = useState([]); // État pour la liste des membres
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [tabValue, setTabValue] = useState(0);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [assistanceDialogOpen, setAssistanceDialogOpen] = useState(false);
@@ -100,23 +93,7 @@ export default function CasSociaux() {
         date_assistance: new Date().toISOString().split('T')[0]
     });
 
-    useEffect(() => {
-        if (token) {
-            fetchInitialData();
-        }
-    }, [token]);
-
-    const fetchInitialData = async () => {
-        setLoading(true);
-        await Promise.all([
-            fetchCasSociaux(),
-            fetchAssistances(),
-            fetchMembres()
-        ]);
-        setLoading(false);
-    };
-
-    const fetchCasSociaux = async () => {
+    const fetchCasSociaux = useCallback(async () => {
         try {
             const response = await axios.get(getApiUrl('/cas-sociaux'), {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -125,9 +102,9 @@ export default function CasSociaux() {
         } catch (err) {
             console.error('Erreur cas sociaux:', err);
         }
-    };
+    }, [token]);
 
-    const fetchAssistances = async () => {
+    const fetchAssistances = useCallback(async () => {
         try {
             const response = await axios.get(getApiUrl('/assistances'), {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -136,9 +113,9 @@ export default function CasSociaux() {
         } catch (err) {
             console.error('Erreur assistances:', err);
         }
-    };
+    }, [token]);
 
-    const fetchMembres = async () => {
+    const fetchMembres = useCallback(async () => {
         try {
             const response = await axios.get(getApiUrl('/members'), {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -149,7 +126,23 @@ export default function CasSociaux() {
         } catch (err) {
             console.error('Erreur membres:', err);
         }
-    };
+    }, [token]);
+
+    const fetchInitialData = useCallback(async () => {
+        setLoading(true);
+        await Promise.all([
+            fetchCasSociaux(),
+            fetchAssistances(),
+            fetchMembres()
+        ]);
+        setLoading(false);
+    }, [fetchCasSociaux, fetchAssistances, fetchMembres]);
+
+    useEffect(() => {
+        if (token) {
+            fetchInitialData();
+        }
+    }, [token, fetchInitialData]);
 
     const handleOpenCasDialog = (cas = null) => {
         if (cas) {

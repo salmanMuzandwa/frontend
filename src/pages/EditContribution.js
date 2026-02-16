@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,7 +12,7 @@ import { Save, ArrowBack } from '@mui/icons-material';
 const EditContribution = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { token } = useAuth();
+    const { } = useAuth();
 
     const [contribution, setContribution] = useState(null);
     const [members, setMembers] = useState([]);
@@ -51,21 +51,7 @@ const EditContribution = () => {
         { value: 'competence', label: 'Compétence' }
     ];
 
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                await Promise.all([
-                    fetchContribution(),
-                    fetchMembers()
-                ]);
-            } catch (error) {
-                console.error('Erreur lors du chargement des données:', error);
-            }
-        };
-        loadData();
-    }, [id, token]);
-
-    const fetchContribution = async () => {
+    const fetchContribution = useCallback(async () => {
         try {
             const response = await api.get(`/contributions/${id}`);
             const contributionData = response.data;
@@ -99,16 +85,30 @@ const EditContribution = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
 
-    const fetchMembers = async () => {
+    const fetchMembers = useCallback(async () => {
         try {
             const response = await api.get('/members');
             setMembers(response.data || []);
         } catch (err) {
             console.error("Erreur de chargement des membres:", err);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        const loadData = async () => {
+            try {
+                await Promise.all([
+                    fetchContribution(),
+                    fetchMembers()
+                ]);
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error);
+            }
+        };
+        loadData();
+    }, [fetchContribution, fetchMembers]);
 
     const handleInputChange = (field, value) => {
         setFormData(prev => ({

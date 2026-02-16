@@ -21,7 +21,7 @@ import {
     Badge,
     Button
 } from '@mui/material';
-import { Dashboard as DashboardIcon, Group, People, Paid, Event, Description, Book, ExitToApp, Person, MenuBook, Menu as MenuIcon, HowToReg, AccountBalance } from '@mui/icons-material';
+import { Dashboard as DashboardIcon, Group, People, Event, Description, Book, ExitToApp, Person, MenuBook, Menu as MenuIcon, HowToReg, AccountBalance } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { getProfilePhotoUrl } from '../utils/urlHelper';
 import api from '../api/axiosConfig';

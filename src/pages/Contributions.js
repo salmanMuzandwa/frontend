@@ -10,7 +10,7 @@ import {
     InputLabel, Select, TextField, Dialog, DialogTitle, DialogContent,
     DialogActions, Avatar, useMediaQuery, useTheme
 } from '@mui/material';
-import { Add, Delete, Visibility, FilterList, Print, Refresh, VolunteerActivism, Handshake, CardGiftcard, Campaign, Edit, AccountBalance, TrendingUp, Payment, MonetizationOn } from '@mui/icons-material';
+import { Add, Delete, Visibility, FilterList, Print, Refresh, VolunteerActivism, Handshake, CardGiftcard, Campaign, Edit } from '@mui/icons-material';
 
 const Contributions = () => {
     const [contributions, setContributions] = useState([]);

@@ -65,7 +65,7 @@ const ChangePassword = () => {
         setSuccess('');
 
         try {
-            const response = await axios.put('/api/user/change-password', {
+            await axios.put('/api/user/change-password', {
                 currentPassword: formData.currentPassword,
                 newPassword: formData.newPassword
             }, {

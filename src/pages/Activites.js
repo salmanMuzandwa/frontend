@@ -39,15 +39,7 @@ import {
     LocationOn as LocationIcon,
     CalendarToday as CalendarIcon,
     Schedule as ScheduleIcon,
-    Cancel as CancelIcon,
-    Visibility,
-    FilterList,
-    Print,
-    Refresh,
-    VolunteerActivism,
-    Handshake,
-    CardGiftcard,
-    Campaign
+    Cancel as CancelIcon
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axiosConfig';

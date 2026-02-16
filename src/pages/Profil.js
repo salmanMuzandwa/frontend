@@ -60,7 +60,7 @@ export default function Profil() {
     const [userStats, setUserStats] = useState(null);
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
     const fileInputRef = useRef(null);
-    const { user: authUser, hasPermission, updateUser } = useAuth();
+    const { user: authUser, updateUser } = useAuth();
     const navigate = useNavigate();
 
     const fetchUserData = useCallback(async () => {

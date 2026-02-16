@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import {
-    Container, Paper, Box, CircularProgress, Alert, Button,
-    Card, CardContent, Grid, Divider, Chip, TextField, FormControl, InputLabel, Select, MenuItem, Avatar,
-    IconButton
+    Box, CircularProgress, Button, Avatar, IconButton
 } from '@mui/material';
 import { PhotoCamera, Edit } from '@mui/icons-material';
 import api from '../api/axiosConfig';

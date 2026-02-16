@@ -1,6 +1,6 @@
 // src/pages/MembreDashboard.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container, Typography, Grid, Paper, Box, CircularProgress, List, ListItem, ListItemText, Avatar, Chip, Button, Card, CardContent, LinearProgress, Badge } from '@mui/material';
 import { EventAvailable, HowToReg, CalendarToday, TrendingUp, Star, EmojiEvents, AccessTime, LocationOn, Group, CheckCircle, Cancel } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -145,130 +145,133 @@ const MembreDashboard = () => {
     const [userInfo, setUserInfo] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchMembreData = async () => {
-            console.log('Démarrage du chargement du dashboard membre...');
+    const fetchMembreData = useCallback(async () => {
+        console.log('Démarrage du chargement du dashboard membre...');
+        setLoading(true);
 
+        try {
+            const storedUser = localStorage.getItem('user');
+            console.log('Utilisateur stocké:', storedUser);
+
+            const userData = storedUser ? JSON.parse(storedUser) : null;
+            console.log('Données utilisateur parsées:', userData);
+
+            const token = userData?.token;
+            console.log('Token disponible:', !!token);
+
+            if (!token) {
+                console.error('Token manquant');
+                setError('Token d\'authentification manquant. Veuillez vous reconnecter.');
+                setLoading(false);
+                return;
+            }
+
+            const config = {
+                headers: { Authorization: `Bearer ${token}` }
+            };
+
+            // 1. Récupérer les informations de l'utilisateur
+            let currentInfo = null;
             try {
-                const storedUser = localStorage.getItem('user');
-                console.log('Utilisateur stocké:', storedUser);
+                console.log('Récupération du profil utilisateur...');
+                const userResponse = await axios.get(getApiUrl('/user/profile'), config);
+                console.log('Réponse profil:', userResponse.data);
+                currentInfo = userResponse.data;
+                setUserInfo(currentInfo);
+            } catch (err) {
+                console.error('Erreur profil:', err);
+                // Continuer même si le profil échoue
+            }
 
-                const userData = storedUser ? JSON.parse(storedUser) : null;
-                console.log('Données utilisateur parsées:', userData);
+            // 2. Récupérer les activités à venir
+            let upcoming = [];
+            try {
+                console.log('Récupération des activités...');
+                const activitiesResponse = await axios.get(getApiUrl('/activites'), config);
+                console.log('Réponse activités:', activitiesResponse.data);
+                const allActivities = activitiesResponse.data || [];
 
-                const token = userData?.token;
-                console.log('Token disponible:', !!token);
+                // Filtrer les activités à venir (dans le futur)
+                upcoming = allActivities
+                    .filter(activity => new Date(activity.date_debut) >= new Date())
+                    .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut))
+                    .slice(0, 5);
 
-                if (!token) {
-                    console.error('Token manquant');
-                    setError('Token d\'authentification manquant. Veuillez vous reconnecter.');
-                    setLoading(false);
-                    return;
-                }
+                console.log('Activités à venir filtrées:', upcoming);
+                setUpcomingActivities(upcoming);
+            } catch (err) {
+                console.warn('Impossible de charger les activités:', err);
+                setUpcomingActivities([]);
+            }
 
-                const config = {
-                    headers: { Authorization: `Bearer ${token}` }
+            // 3. Récupérer l'historique des présences
+            try {
+                console.log('Récupération des présences pour membre ID:', userData.user.id);
+                const presencesResponse = await axios.get(getApiUrl(`/presences?membre_id=${userData.user.id}`), config);
+                console.log('Réponse présences:', presencesResponse.data);
+                const presences = presencesResponse.data || [];
+
+                // Calculer les statistiques de présence
+                const totalPresences = presences.length;
+                const presentCount = presences.filter(p => p.statut === 'Présent').length;
+                const attendanceRate = totalPresences > 0 ? Math.round((presentCount / totalPresences) * 100) : 0;
+
+                // Préparer les données pour le graphique mensuel
+                const monthlyData = presences.reduce((acc, presence) => {
+                    const date = new Date(presence.date_heure);
+                    const monthYear = date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+
+                    if (!acc[monthYear]) {
+                        acc[monthYear] = { month: monthYear, present: 0, absent: 0, total: 0 };
+                    }
+
+                    if (presence.statut === 'Présent') {
+                        acc[monthYear].present++;
+                    } else {
+                        acc[monthYear].absent++;
+                    }
+                    acc[monthYear].total++;
+
+                    return acc;
+                }, {});
+
+                const chartData = Object.values(monthlyData).slice(-6);
+
+                const stats = {
+                    totalPresences: totalPresences,
+                    presentCount: presentCount,
+                    attendanceRate: attendanceRate,
+                    monthlyData: chartData,
+                    upcomingCount: upcoming.length // Utiliser la variable locale 'upcoming'
                 };
 
-                // Récupérer les informations de l'utilisateur
-                try {
-                    console.log('Récupération du profil utilisateur...');
-                    const userResponse = await axios.get(getApiUrl('/user/profile'), config);
-                    console.log('Réponse profil:', userResponse.data);
-                    setUserInfo(userResponse.data);
-                } catch (err) {
-                    console.error('Erreur profil:', err);
-                    // Continuer même si le profil échoue
-                }
-
-                // Récupérer les activités à venir
-                try {
-                    console.log('Récupération des activités...');
-                    const activitiesResponse = await axios.get(getApiUrl('/activites'), config);
-                    console.log('Réponse activités:', activitiesResponse.data);
-                    const allActivities = activitiesResponse.data || [];
-
-                    // Filtrer les activités à venir (dans le futur)
-                    const upcoming = allActivities
-                        .filter(activity => new Date(activity.date_debut) >= new Date())
-                        .sort((a, b) => new Date(a.date_debut) - new Date(b.date_debut))
-                        .slice(0, 5);
-
-                    console.log('Activités à venir filtrées:', upcoming);
-                    setUpcomingActivities(upcoming);
-                } catch (err) {
-                    console.warn('Impossible de charger les activités:', err);
-                    setUpcomingActivities([]);
-                    setLoading(false);
-                }
-
-                // Récupérer l'historique des présences
-                try {
-                    console.log('Récupération des présences pour membre ID:', userData.user.id);
-                    const presencesResponse = await axios.get(getApiUrl(`/presences?membre_id=${userData.user.id}`), config);
-                    console.log('Réponse présences:', presencesResponse.data);
-                    const presences = presencesResponse.data || [];
-
-                    // Calculer les statistiques de présence
-                    const totalPresences = presences.length;
-                    const presentCount = presences.filter(p => p.statut === 'Présent').length;
-                    const attendanceRate = totalPresences > 0 ? Math.round((presentCount / totalPresences) * 100) : 0;
-
-                    // Préparer les données pour le graphique mensuel
-                    const monthlyData = presences.reduce((acc, presence) => {
-                        const date = new Date(presence.date_heure);
-                        const monthYear = date.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
-
-                        if (!acc[monthYear]) {
-                            acc[monthYear] = { month: monthYear, present: 0, absent: 0, total: 0 };
-                        }
-
-                        if (presence.statut === 'Présent') {
-                            acc[monthYear].present++;
-                        } else {
-                            acc[monthYear].absent++;
-                        }
-                        acc[monthYear].total++;
-
-                        return acc;
-                    }, {});
-
-                    const chartData = Object.values(monthlyData).slice(-6);
-
-                    const stats = {
-                        totalPresences: totalPresences,
-                        presentCount: presentCount,
-                        attendanceRate: attendanceRate,
-                        monthlyData: chartData,
-                        upcomingCount: upcomingActivities.length
-                    };
-
-                    console.log('Statistiques calculées:', stats);
-                    setUserStats(stats);
-                    setAttendanceHistory(presences.slice(0, 10));
-
-                } catch (err) {
-                    console.warn('Impossible de charger les présences:', err);
-                    setUserStats({
-                        totalPresences: 0,
-                        presentCount: 0,
-                        attendanceRate: 0,
-                        monthlyData: [],
-                        upcomingCount: upcomingActivities.length
-                    });
-                }
+                console.log('Statistiques calculées:', stats);
+                setUserStats(stats);
+                setAttendanceHistory(presences.slice(0, 10));
 
             } catch (err) {
-                console.error('Erreur générale lors du chargement des données:', err);
-                setError('Erreur lors du chargement de vos données. Veuillez réessayer.');
-            } finally {
-                console.log('Chargement terminé, setLoading(false)');
-                setLoading(false);
+                console.warn('Impossible de charger les présences:', err);
+                setUserStats({
+                    totalPresences: 0,
+                    presentCount: 0,
+                    attendanceRate: 0,
+                    monthlyData: [],
+                    upcomingCount: upcoming.length // Utiliser la variable locale 'upcoming'
+                });
             }
-        };
 
+        } catch (err) {
+            console.error('Erreur générale lors du chargement des données:', err);
+            setError('Erreur lors du chargement de vos données. Veuillez réessayer.');
+        } finally {
+            console.log('Chargement terminé, setLoading(false)');
+            setLoading(false);
+        }
+    }, [navigate]); // Ajouter navigate aux dépendances de useCallback
+
+    useEffect(() => {
         fetchMembreData();
-    }, []);
+    }, [fetchMembreData]);
 
     const handleParticipate = (activityId) => {
         // Logique pour s'inscrire à une activité
