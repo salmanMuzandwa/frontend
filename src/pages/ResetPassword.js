@@ -89,7 +89,7 @@ const ResetPassword = () => {
         setSuccess('');
 
         try {
-            const response = await axios.post('/api/reset-password', {
+            await axios.post('/api/reset-password', {
                 token: token,
                 newPassword: formData.newPassword
             });

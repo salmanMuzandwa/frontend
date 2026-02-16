@@ -3,7 +3,7 @@ import {
     Container, Typography, Paper, Box, CircularProgress, Alert, Button,
     Card, CardContent, Grid, Divider, Chip
 } from '@mui/material';
-import { ArrowBack, Edit, Email, Phone, Work, Person, CalendarToday, Badge } from '@mui/icons-material';
+import { ArrowBack, Edit, Email, Person, CalendarToday, Badge } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';

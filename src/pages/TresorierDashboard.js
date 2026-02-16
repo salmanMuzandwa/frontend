@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Grid, Paper, Box, CircularProgress, Alert, List, ListItem, ListItemText, Avatar, Chip, Button, Card, CardContent } from '@mui/material';
-import { AttachMoney, People, Timeline, TrendingUp, AccountBalance, Help, Healing } from '@mui/icons-material';
+import { AttachMoney, People, TrendingUp, AccountBalance, Healing } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getApiUrl } from '../utils/urlHelper';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Composant pour les cartes de KPI
 const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (

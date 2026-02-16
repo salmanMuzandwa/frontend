@@ -3,7 +3,7 @@ import {
     Container, Typography, Paper, Box, CircularProgress, Alert, Button,
     Card, CardContent, Grid, Divider, Chip, TextField, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
-import { ArrowBack, Edit, Delete, Print, VolunteerActivism, Handshake, CardGiftcard } from '@mui/icons-material';
+import { ArrowBack, Print, VolunteerActivism, Handshake, CardGiftcard } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';

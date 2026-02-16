@@ -63,32 +63,7 @@ export default function Profil() {
     const { user: authUser, hasPermission, updateUser } = useAuth();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Initialiser avec les données locales si disponibles
-        if (authUser) {
-            setUser(authUser);
-            setFormData({
-                nom: authUser.nom || '',
-                prenom: authUser.prenom || '',
-                email: authUser.email || '',
-                telephone: authUser.telephone || '',
-                adresse: authUser.adresse || '',
-                profession: authUser.profession || '',
-                date_naissance: authUser.date_naissance || '',
-                lieu_naissance: authUser.lieu_naissance || '',
-                sexe: authUser.sexe || ''
-            });
-
-            // Charger les stats en arrière-plan
-            fetchUserStats();
-        }
-
-        // Toujours charger les données à jour du serveur une seule fois au montage
-        // pour récupérer les champs manquants (comme member_id) et synchroniser
-        fetchUserData();
-    }, []); // Dépendance vide pour exécuter une seule fois au montage
-
-    const fetchUserData = async () => {
+    const fetchUserData = useCallback(async () => {
         try {
             const response = await api.get('/user/profile');
             const updatedUser = { ...response.data };
@@ -105,7 +80,7 @@ export default function Profil() {
             // Mettre à jour le contexte global seulement si nécessaire pour éviter les boucles
             // On vérifie si member_id ou d'autres champs clés ont changé
             if (updateUser && (
-                !authUser?.member_id && updatedUser.member_id ||
+                (!authUser?.member_id && updatedUser.member_id) ||
                 JSON.stringify(authUser) !== JSON.stringify(updatedUser)
             )) {
                 updateUser(updatedUser);
@@ -132,9 +107,9 @@ export default function Profil() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, authUser, updateUser]);
 
-    const fetchUserStats = async () => {
+    const fetchUserStats = useCallback(async () => {
         try {
             const response = await api.get('/user/stats');
             setUserStats(response.data);
@@ -149,7 +124,32 @@ export default function Profil() {
                 activitesRecentess: []
             });
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        // Initialiser avec les données locales si disponibles
+        if (authUser) {
+            setUser(authUser);
+            setFormData({
+                nom: authUser.nom || '',
+                prenom: authUser.prenom || '',
+                email: authUser.email || '',
+                telephone: authUser.telephone || '',
+                adresse: authUser.adresse || '',
+                profession: authUser.profession || '',
+                date_naissance: authUser.date_naissance || '',
+                lieu_naissance: authUser.lieu_naissance || '',
+                sexe: authUser.sexe || ''
+            });
+
+            // Charger les stats en arrière-plan
+            fetchUserStats();
+        }
+
+        // Toujours charger les données à jour du serveur une seule fois au montage
+        // pour récupérer les champs manquants (comme member_id) et synchroniser
+        fetchUserData();
+    }, [authUser, fetchUserData, fetchUserStats]);
 
     const handleOpenDialog = () => {
         setDialogOpen(true);
