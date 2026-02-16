@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axiosConfig';
-import { useAuth } from '../contexts/AuthContext';
+
 import { handleApiError, showErrorNotification, showSuccessNotification } from '../utils/errorHandler';
 import {
     Container, Typography, Paper, Button, Box, Grid, FormControl,
